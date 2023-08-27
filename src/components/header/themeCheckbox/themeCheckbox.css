@@ -1,0 +1,17 @@
+.theme-checkbox {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  font-family: "FiraCode";
+  color: #666;
+}
+
+.theme-checkbox input {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--primary);
+}

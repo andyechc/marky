@@ -1,0 +1,16 @@
+.header {
+  height: 50px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  box-shadow: 0 0 20px #0003;
+}
+
+:root.dark .header {
+  border-color: #333;
+  background: #000010;
+}

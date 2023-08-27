@@ -1,0 +1,11 @@
+.logo {
+  user-select: none;
+  color: var(--color-primary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 15px;
+  font-family: "Museo";
+  font-weight: 700;
+  gap: 5px;
+}

@@ -1,14 +1,16 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import Header from "./components/header"
+import Editor from "./components/editor"
+import Footer from "./components/footer"
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const [ text, setText ] = useState(null)
+  
   return (
     <>
-    hi
+      <Header />
+      <Editor text={ text } setText={ setText } />
+      <Footer length={ text ? text.length : 0 } />
     </>
   )
 }
