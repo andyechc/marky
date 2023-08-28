@@ -19,8 +19,8 @@ function Writer () {
   return (
     <section className="writer">
       <small className="title">
-        { extension === "md" ? <MdIcon size="1.5em" /> : "TXT " } 
-        - { fileName }
+        { extension === "md" ? <MdIcon size="1.5em" color="#700"/> : "TXT " } 
+        { fileName }
       </small>
       
       <textarea onChange={ handleChange } value={ text } placeholder="Start Coding Markdown Here..." />

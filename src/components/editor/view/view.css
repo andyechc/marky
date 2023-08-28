@@ -2,20 +2,19 @@
   width: 100%;
   height: 100%;
   color: var(--color-2);
-}
-
-.view .title {
-  padding: 20px;
-  color: var(--color-2);
+  display: flex;
+  align-items: center;
 }
 
 .view-code {
   width: 100%;
   max-height: 100%;
-  display: block;
   padding: 20px;
   color: var(--color-2);
   overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .view-code h1 {
@@ -23,16 +22,6 @@
   font-size: 30px;
   font-weight: 1000;
   border-bottom: 1px solid var(--color-2);
-}
-
-.view-code h1,
-.view-code h2,
-.view-code h3,
-.view-code h4,
-.view-code h5,
-.view-code h6 {
-  margin-top: 30px;
-  margin-bottom: 10px;
 }
 
 .view-code p {
@@ -47,7 +36,6 @@
   border-radius: 0 5px 5px 0;
   border-left: 6px solid #ff3333;
   box-shadow: 5px 5px 10px -5px #000;
-  margin: 20px auto;
 }
 
 .view-code blockquote a {
@@ -81,4 +69,22 @@
 
 .view-code table td {
   padding: 10px;
+}
+
+.view-code pre {
+  box-shadow: 5px 5px 10px #0003;
+  border-radius: 10px;
+}
+
+.view-code pre div {
+  border-radius: 10px;
+}
+
+.view-code code {
+  font-family: "FiraCode";
+  background: var(--bg-2);
+  color: var(--color-2);
+  padding: 10px;
+  border-radius: 7px;
+  margin: 20px auto;
 }
