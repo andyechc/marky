@@ -7,7 +7,7 @@
   align-items: center;
   gap: 10px;
   font-family: "FiraCode";
-  color: #666;
+  color: var(--color-1);
 }
 
 .theme-checkbox input {

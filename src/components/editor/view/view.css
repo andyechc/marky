@@ -1,36 +1,28 @@
 .view {
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-:root.dark .view {
-  color: #aaa;
+  color: var(--color-2);
 }
 
 .view .title {
   padding: 20px;
-  color: #777;
+  color: var(--color-2);
 }
 
 .view-code {
   width: 100%;
-  height: 100%;
+  max-height: 100%;
+  display: block;
   padding: 20px;
+  color: var(--color-2);
   overflow-y: scroll;
-  color: #555;
-}
-
-:root.dark .view-code {
-  color: #aaa;
 }
 
 .view-code h1 {
-  color: var(--color-primary);
+  color: var(--color-1);
   font-size: 30px;
   font-weight: 1000;
-  border-bottom: 1px solid #aaa;
+  border-bottom: 1px solid var(--color-2);
 }
 
 .view-code h1,
@@ -48,13 +40,19 @@
 }
 
 .view-code blockquote {
-  background: #555;
-  color: #ccc;
+  background: var(--bg-3);
+  color: var(--color-2);
+  padding: 10px;
   font-weight: bold;
   border-radius: 0 5px 5px 0;
-  border-left: 5px solid #ccc;
+  border-left: 6px solid #ff3333;
   box-shadow: 5px 5px 10px -5px #000;
   margin: 20px auto;
+}
+
+.view-code blockquote a {
+  color: #ff3333;
+  transition: all 300ms ease;
 }
 
 .view-code ul {
@@ -63,3 +61,24 @@
   font-weight: bold;
 }
 
+.view-code table {
+  margin: 20px auto;
+  border: 1px solid #777;
+  border-spacing: 0;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 0 20px -10px #000;
+  border-radius: 10px;
+}
+
+.view-code table th {
+  color: var(--color-primary);
+  border-bottom: 1px solid #777;
+  padding: 10px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.view-code table td {
+  padding: 10px;
+}

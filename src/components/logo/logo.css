@@ -1,6 +1,6 @@
 .logo {
   user-select: none;
-  color: var(--color-primary);
+  color: var(--color-1);
   display: flex;
   justify-content: center;
   align-items: center;

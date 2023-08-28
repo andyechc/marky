@@ -1,8 +1,16 @@
 :root {
   --primary: #ff0f00;
+  --color-1: #10101a;
+  --color-2: #555;
+  --bg-1: #f0f0f0;
+  --bg-2: #dddddd;
+  --bg-3: #bbbbbb;
 }
 
 :root.dark {
-  --color-primary: #f0f0ff;
-  --bg-color: #001017;
+  --color-1: #f0f0f0;
+  --color-2: #ccc;
+  --bg-1: #10101a;
+  --bg-2: #20202a;
+  --bg-3: #30303a;
 }

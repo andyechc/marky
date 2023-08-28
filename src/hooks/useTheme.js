@@ -6,9 +6,9 @@ export default function useTheme () {
   useEffect(() => {
     const cacheTheme = JSON.parse(localStorage.getItem('theme'))
     
-    if (cacheTheme === true) {
+    if (cacheTheme) {
+      document.querySelector(':root').classList.toggle('dark')
       setIsDark(cacheTheme)
-      document.querySelector(":root").classList.toggle('dark')
     }
   }, []);
   

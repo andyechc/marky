@@ -1,12 +1,14 @@
+import Menu from './menu'
 import Writer from './writer'
 import View from './view'
 import './editor.css'
 
-const Editor = ({ text, setText }) => {
+function Editor () {
   return (
     <main className="editor">
-      <Writer setText={ setText }/>
-      <View text={ text } />
+      <Menu />
+      <Writer />
+      <View />
     </main>
   )
 }

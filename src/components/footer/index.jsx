@@ -1,24 +1,26 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { FileContext } from '/src/context/fileContext'
 import './footer.css'
 
-const Footer = ({ length }) => {
+function Footer () {
+  const { text } = useContext( FileContext )
   const [ space, setSpace ] = useState(null)
   
   useEffect(() => {
-    if (length) {
-      if (length.toLocaleString().length >= 5){ 
-        setSpace(Math.floor((length / 1024)) + " klb")
+    if (text) {
+      if (text.length.toLocaleString().length >= 5){ 
+        setSpace(Math.floor((text.length / 1024)) + " klb")
       }
       else{
-        setSpace(length + " b")
+        setSpace(text.length + " b")
       }
     }
     
-  }, [length]);
+  }, [text]);
   
   return (
     <footer className="footer">
-      <p>Length: { length || 0 }</p>
+      <p>Length: { text.length || 0 }</p>
       <p>Space: { space || 0 }</p>
     </footer>
   )

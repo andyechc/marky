@@ -6,11 +6,8 @@
   align-items: center;
   gap: 20px;
   padding: 10px;
-  border-bottom: 1px solid #ccc;
-  box-shadow: 0 0 20px #0003;
-}
-
-:root.dark .header {
-  border-color: #333;
-  background: #000010;
+  background: var(--bg-3);
+  position: sticky;
+  top: 0;
+  left: 0;
 }

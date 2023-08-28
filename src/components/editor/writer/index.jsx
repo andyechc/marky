@@ -1,17 +1,31 @@
+import { useContext } from 'react'
+import { FileContext } from '/src/context/fileContext'
+import { MdIcon } from '/src/components/icons'
 import './writer.css'
 
-const Writer = ({ setText }) => {
+function Writer () {
+  const { 
+    text, 
+    fileName, 
+    setText, 
+    extension
+  } = useContext(FileContext)
+  
   const handleChange = e => {
     const newText = e.target.value
-    setText(newText)
+    setText( newText )
   }
   
   return (
     <section className="writer">
-    <h2 className="title">Code</h2>
-      <textarea onChange={ handleChange } placeholder="Start Coding Markdown Here..." />
+      <small className="title">
+        { extension === "md" ? <MdIcon size="1.5em" /> : "TXT " } 
+        - { fileName }
+      </small>
+      
+      <textarea onChange={ handleChange } value={ text } placeholder="Start Coding Markdown Here..." />
     </section>
   )
 }
 
-export default Writer;
+export default Writer
