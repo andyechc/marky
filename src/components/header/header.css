@@ -7,7 +7,4 @@
   gap: 20px;
   padding: 10px;
   background: var(--bg-3);
-  position: sticky;
-  top: 0;
-  left: 0;
 }

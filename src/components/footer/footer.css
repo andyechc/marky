@@ -1,6 +1,6 @@
 .footer {
   width: 100%;
-  height: 50px;
+  height: 40px;
   display: flex;
   align-items: center;
   padding: 20px;
@@ -8,7 +8,4 @@
   color: var(--color-2);
   font-family: "FiraCode";
   background: var(--bg-3);
-  position: sticky;
-  bottom: 0;
-  left: 0;
 }
