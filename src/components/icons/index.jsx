@@ -19,7 +19,7 @@ function MdIcon ({ size, color }) {
     <svg 
       stroke="currentColor" 
       fill={ color || "currentColor" }
-      stroke-width="0" 
+      strokeWidth="0" 
       role="img" 
       viewBox="0 0 24 24" 
       height={ size }
@@ -34,6 +34,64 @@ function MdIcon ({ size, color }) {
   )
 }
 
+function MoonIcon ({ size, color, className }) {
+  return (
+    <svg
+      className={ className }
+      stroke="currentColor" 
+      fill={ color || "currentColor" } 
+      strokeWidth="0" 
+      viewBox="0 0 24 24" 
+      height={ size }
+      width={ size }
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path 
+        d="M12 11.807A9.002 9.002 0 0 1 10.049 2a9.942 9.942 0 0 0-5.12 2.735c-3.905 3.905-3.905 10.237 0 14.142 3.906 3.906 10.237 3.905 14.143 0a9.946 9.946 0 0 0 2.735-5.119A9.003 9.003 0 0 1 12 11.807z"
+      ></path>
+    </svg>
+  )
+}
+
+function EditIcon ({ size, color, className }) {
+  return (
+    <svg 
+      className={ className }
+      stroke={ color || "currentColor" } 
+      fill="none" 
+      strokeWidth="2" 
+      viewBox="0 0 24 24" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      height={ size } 
+      width={ size }
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path 
+        d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+        ></path>
+      <path 
+        d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+      ></path>
+    </svg>
+  )
+}
+
+function SaveIcon ({ size, color }) {
+  return (
+    <svg 
+      stroke="currentColor" 
+      fill={ color } 
+      strokeWidth="0" 
+      viewBox="0 0 24 24" 
+      height={ size } 
+      width={ size } 
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path fill="none" d="M0 0h24v24H0z"></path><path d="M17 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"></path>
+    </svg>
+  )
+}
 
 
-export { CrayonIcon, MdIcon };
+export { CrayonIcon, MdIcon, MoonIcon, EditIcon, SaveIcon };

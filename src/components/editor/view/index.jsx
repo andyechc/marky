@@ -27,6 +27,7 @@ function View () {
                 {...props}
                 children={String(children).replace(/\n$/, '')}
                 language={match[1]}
+                wrapLongLines={true}
                 PreTag="div"
               />
             ) : (

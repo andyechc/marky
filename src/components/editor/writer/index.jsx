@@ -1,15 +1,10 @@
 import { useContext } from 'react'
 import { FileContext } from '/src/context/fileContext'
-import { MdIcon } from '/src/components/icons'
+import FileTag from './fileTag'
 import './writer.css'
 
 function Writer () {
-  const { 
-    text, 
-    fileName, 
-    setText, 
-    extension
-  } = useContext(FileContext)
+  const { text, setText } = useContext(FileContext)
   
   const handleChange = e => {
     const newText = e.target.value
@@ -18,12 +13,14 @@ function Writer () {
   
   return (
     <section className="writer">
-      <small className="title">
-        { extension === "md" ? <MdIcon size="1.5em" color="#700"/> : "TXT " } 
-        { fileName }
-      </small>
+      <FileTag />
       
-      <textarea onChange={ handleChange } value={ text } placeholder="Start Coding Markdown Here..." />
+      <textarea 
+        onChange={ handleChange } 
+        value={ text } 
+        placeholder="Start Coding Markdown Here..." 
+        translate="no"
+      />
     </section>
   )
 }

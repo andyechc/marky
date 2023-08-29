@@ -1,0 +1,17 @@
+.file-system-item {
+  display: flex;
+  align-items: center;
+  padding-left: 20px;
+  gap: 10px;
+  cursor: pointer;
+  color: var(--color-1);
+}
+
+.file-system-item p {
+  color: var(--color-1);
+  font-weight: 500;
+}
+
+.file-system-item:hover {
+  background: var(--bg-3);
+}

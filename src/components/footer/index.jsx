@@ -12,7 +12,7 @@ function Footer () {
         setSpace(Math.floor((text.length / 1024)) + " klb")
       }
       else{
-        setSpace(text.length + " b")
+        setSpace(text.length + " bytes")
       }
     }
     

@@ -1,4 +1,5 @@
 import useTheme from "/src/hooks/useTheme"
+import { MoonIcon } from "/src/components/icons"
 import './themeCheckbox.css'
 
 const ThemeCheckbox = () => {
@@ -12,8 +13,10 @@ const ThemeCheckbox = () => {
   
   return (
     <label className="theme-checkbox">
+      <MoonIcon size="1.4em" className={ isDark ? "moon-dark" : null } />
       Dark Theme
-      <input type="checkbox" checked={isDark} onChange={handleTheme}/>
+      
+      <input type="checkbox" hidden={true} checked={isDark} onChange={handleTheme}/>
     </label>
   )
 }

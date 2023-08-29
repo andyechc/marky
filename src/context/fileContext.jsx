@@ -1,4 +1,5 @@
 import { createContext, useState } from "react"
+import { saveAs } from "file-saver"
 
 const FileContext = createContext()
 
@@ -8,12 +9,24 @@ export function FileContextProvider ({ children }) {
   
   const extension = fileName.split(".").reverse()[0]
   
+  function saveFile () {
+    const blob = new Blob( [text], { type: 'text/markdown;chartset=utf-8'})
+    try{
+      saveAs( blob, fileName)
+    }
+    catch (e) {
+      alert(e)
+    }
+    
+  }
+  
   const data = {
     fileName,
     setFileName,
     text,
     setText,
-    extension
+    extension,
+    saveFile
   }
   
   return (

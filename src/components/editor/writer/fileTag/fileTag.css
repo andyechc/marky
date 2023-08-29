@@ -1,0 +1,39 @@
+.file-tag {
+  width: 200px;
+  height: 30px;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px;
+  color: var(--color-2);
+  font-weight: 600;
+  background: var(--bg-1);
+  border-left: 5px solid var(--primary);
+  border-radius: 10px 10px 0 0;
+  transform: translatey(-30px);
+  top: 0;
+  right: 0;
+  z-index: 20;
+}
+
+.file-tag input {
+  width: 100%;
+  border: none;
+  background: var(--bg-1);
+  padding: 2px 5px;
+  color: var(--color-1);
+  outline: 1px solid var(--primary);
+  border-radius: 3px;
+}
+
+.file-tag input:disabled {
+  color: var(--color-2);
+  cursor: text;
+  outline: none;
+}
+
+.file-tag input:focus {
+  outline: 1px solid var(--primary);
+}

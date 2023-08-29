@@ -15,3 +15,7 @@
   height: 15px;
   accent-color: var(--primary);
 }
+
+.moon-dark {
+  color: var(--primary);
+}

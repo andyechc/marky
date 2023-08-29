@@ -1,0 +1,25 @@
+.menu-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.menu-section header {
+  width: 100%;
+  text-align: left;
+  padding: 10px;
+}
+
+.menu-section header strong {
+  font-size: 18px;
+  color: var(--color-2);
+}
+
+.menu-section ul {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
