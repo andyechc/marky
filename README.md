@@ -76,10 +76,10 @@ Este proyecto está bajo la Licencia MIT. Mira el archivo [LICENSE](LICENSE) par
 
 ## 🔗 Links
 
-- [Demo en vivo](https://marky.vercel.app/)
+- [Demo en vivo](https://marky-md.vercel.app/)
 - [GitHub Repository](https://github.com/andyechc/marky)
 - [Issues y Feature Requests](https://github.com/andyechc/marky/issues)
 
 ---
 
-Creado con ❤️ por [Andy Echc](https://github.com/andyechc)
+Creado con ❤️ por [andyechc](https://github.com/andyechc)
