@@ -1,9 +1,0 @@
-.menu {
-  background: var(--bg-2);
-  width: 400px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 40px;
-}

@@ -1,17 +1,15 @@
-import './menuSection.css'
-
-function MenuSection ({ header, children }) {
+function MenuSection({ header, children }) {
   return (
-    <section className="menu-section">
-      <header>
-        <strong>{ header }</strong>
+    <section className="mb-4">
+      <header className="mb-2">
+        <strong className="text-sm text-muted-foreground">{header}</strong>
       </header>
       
-      <ul>
-        { children }
+      <ul className="space-y-1">
+        {children}
       </ul>
     </section>
   )
 }
 
-export default MenuSection;
+export default MenuSection
