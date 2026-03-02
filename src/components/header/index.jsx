@@ -1,20 +1,57 @@
-import { useState, useEffect } from "react"
-import { Moon, Sun, Download, Upload, FileText, Settings, Github, Keyboard } from "lucide-react"
+import { useState, useEffect, useContext } from "react"
+import { Download, Upload, FileText, Settings, Github, Keyboard, Save } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { Toggle } from "@/components/ui/toggle"
 import Logo from '../logo'
 import SettingsModal from '../settings'
 import ShortcutsModal from '../shortcuts'
 import { useSettings } from '@/hooks/useSettings'
+import { FileContext } from '/src/context/fileContext'
+import { safeStorage } from '@/lib/security'
 
 const Header = () => {
   const [showSettings, setShowSettings] = useState(false)
   const [showShortcuts, setShowShortcuts] = useState(false)
   const { settings, updateSettings } = useSettings()
+  const { saveFile, saveFileLocally, newFile, loadFile, fileName, text } = useContext(FileContext)
 
-  const toggleTheme = () => {
-    updateSettings({ isDark: !settings.isDark })
+  const handleOpenFile = () => {
+    // Save current file content before opening new file
+    if (text && text.trim() && fileName) {
+      safeStorage.set(`marky-file-${fileName}`, text)
+    }
+    
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = '.md'
+    input.onchange = (e) => {
+      const file = e.target.files[0]
+      if (file) {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          const content = e.target.result
+          loadFile(content, file.name)
+          // Save the loaded content to individual file storage
+          safeStorage.set(`marky-file-${file.name}`, content)
+        }
+        reader.readAsText(file)
+      }
+    }
+    input.click()
+  }
+
+  const handleSaveFile = () => {
+    const success = saveFileLocally()
+    if (success) {
+      // You could add a toast here if needed, but keeping it minimal for header
+    }
+  }
+
+  const handleDownloadFile = () => {
+    const success = saveFile()
+    if (success) {
+      // You could add a toast here if needed
+    }
   }
 
   useEffect(() => {
@@ -43,13 +80,18 @@ const Header = () => {
           
           <div className="flex flex-1 items-center justify-end space-x-2">
             <nav className="flex items-center space-x-1">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" onClick={handleOpenFile} title="Open file">
                 <Upload className="h-4 w-4" />
                 <span className="sr-only">Open file</span>
               </Button>
               
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" onClick={handleDownloadFile} title="Download file">
                 <Download className="h-4 w-4" />
+                <span className="sr-only">Download file</span>
+              </Button>
+              
+              <Button variant="ghost" size="sm" onClick={handleSaveFile} title="Save file">
+                <Save className="h-4 w-4" />
                 <span className="sr-only">Save file</span>
               </Button>
               
@@ -59,10 +101,6 @@ const Header = () => {
                 <Keyboard className="h-4 w-4" />
                 <span className="sr-only">Keyboard shortcuts</span>
               </Button>
-              
-              <Toggle pressed={settings.isDark} onPressedChange={toggleTheme} aria-label="Toggle dark mode">
-                {settings.isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-              </Toggle>
               
               <Button variant="ghost" size="sm" onClick={() => setShowSettings(true)}>
                 <Settings className="h-4 w-4" />

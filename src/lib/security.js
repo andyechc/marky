@@ -47,7 +47,12 @@ export function deobfuscateData(data) {
   try {
     if (typeof data !== 'string') return data;
     const str = atob(data);
-    return JSON.parse(str);
+    // Try to parse as JSON first, if it fails return as string
+    try {
+      return JSON.parse(str);
+    } catch {
+      return str;
+    }
   } catch (error) {
     console.warn('Failed to deobfuscate data:', error.message);
     return data;

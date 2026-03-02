@@ -4,7 +4,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card } from '@/components/ui/card'
 import { useHotkeys } from 'react-hotkeys-hook'
 import FileTag from './fileTag'
-import { safeStorage, validateFilename } from '@/lib/security'
+import { safeStorage } from '@/lib/security'
 
 function Writer() {
   const { text, setText, fileName, setFileName } = useContext(FileContext)
@@ -32,9 +32,12 @@ function Writer() {
     const savedText = safeStorage.get('marky-autosave')
     const savedFileName = safeStorage.get('marky-filename')
     
-    if (savedText && !text.trim()) {
+    // Only load saved content if current content is empty/default
+    if (savedText && text === "# Welcome to Marky!\n\nStart writing amazing markdown here...") {
       setText(savedText)
     }
+    
+    // Only load saved filename if current filename is default
     if (savedFileName && fileName === "New Document.md") {
       setFileName(savedFileName)
     }

@@ -12,7 +12,10 @@ import { cn } from '@/lib/utils'
 function View() {
   const { fileName, text, extension } = useContext(FileContext)
   
-  if (extension !== "md") {
+  // Check if it's a markdown file or if we should show preview anyway
+  const isMarkdownFile = extension === "md" || !extension || fileName.includes("TMV3IERVY3VTZW50LM1K")
+  
+  if (!isMarkdownFile) {
     return (
       <div className="flex items-center justify-center h-full">
         <Card className="p-8 text-center">
@@ -46,7 +49,7 @@ function View() {
       </div>
       
       <Card className="flex-1 m-4 border-0 shadow-none overflow-auto">
-        <div className="prose prose-gray dark:prose-invert max-w-none p-6">
+        <div className="prose prose-gray dark:prose-invert max-w-4xl p-6 break-words">
           <ReactMarkdown 
             remarkPlugins={[remarkGfm]} 
             components={{
@@ -66,27 +69,27 @@ function View() {
                   </div>
                 ) : (
                   <code {...props} className={cn(
-                    "bg-muted px-1.5 py-0.5 rounded text-sm font-mono",
+                    "bg-muted px-1.5 py-0.5 rounded text-sm font-mono break-all",
                     className
                   )}>
                     {children}
                   </code>
                 )
               },
-              h1: ({children}) => <h1 className="text-3xl font-bold mb-6 pb-2 border-b">{children}</h1>,
-              h2: ({children}) => <h2 className="text-2xl font-semibold mb-4 mt-8">{children}</h2>,
-              h3: ({children}) => <h3 className="text-xl font-semibold mb-3 mt-6">{children}</h3>,
-              p: ({children}) => <p className="mb-4 leading-7">{children}</p>,
+              h1: ({children}) => <h1 className="text-3xl font-bold mb-6 pb-2 border-b break-words">{children}</h1>,
+              h2: ({children}) => <h2 className="text-2xl font-semibold mb-4 mt-8 break-words">{children}</h2>,
+              h3: ({children}) => <h3 className="text-xl font-semibold mb-3 mt-6 break-words">{children}</h3>,
+              p: ({children}) => <p className="mb-4 leading-7 break-words">{children}</p>,
               ul: ({children}) => <ul className="mb-4 pl-6 space-y-1">{children}</ul>,
               ol: ({children}) => <ol className="mb-4 pl-6 space-y-1 list-decimal">{children}</ol>,
-              li: ({children}) => <li className="leading-7">{children}</li>,
+              li: ({children}) => <li className="leading-7 break-words">{children}</li>,
               blockquote: ({children}) => (
-                <blockquote className="border-l-4 border-red-600 pl-4 italic my-4 text-muted-foreground">
+                <blockquote className="border-l-4 border-red-600 pl-4 italic my-4 text-muted-foreground break-words">
                   {children}
                 </blockquote>
               ),
               a: ({children, href}) => (
-                <a href={href} className="text-red-600 hover:text-red-700 hover:underline" target="_blank" rel="noopener noreferrer">
+                <a href={href} className="text-red-600 hover:text-red-700 hover:underline break-all" target="_blank" rel="noopener noreferrer">
                   {children}
                 </a>
               ),
@@ -106,7 +109,7 @@ function View() {
                 </th>
               ),
               td: ({children}) => (
-                <td className="border border-border px-4 py-2">
+                <td className="border border-border px-4 py-2 break-words">
                   {children}
                 </td>
               ),

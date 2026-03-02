@@ -12,11 +12,13 @@ import {
   Clock
 } from 'lucide-react'
 import { useToast } from '@/components/ui/use-toast'
-import { safeStorage, safeJSONParse, validateFilename } from '@/lib/security'
+import { safeStorage } from '@/lib/security'
+import RecentFileContextMenu from '../../recentFileContextMenu'
 
 function Menu() {
-  const { saveFile, fileName, setFileName, setText, exportAsHTML, newFile, loadFile } = useContext(FileContext)
+  const { saveFile, saveFileLocally, fileName, setFileName, text, setText, exportAsHTML, newFile, loadFile } = useContext(FileContext)
   const [recentFiles, setRecentFiles] = useState([])
+  const [contextMenu, setContextMenu] = useState({ isOpen: false, position: { x: 0, y: 0 }, fileName: '' })
   const { toast } = useToast()
 
   useEffect(() => {
@@ -28,12 +30,22 @@ function Menu() {
   }, [])
 
   const handleSave = () => {
-    const success = saveFile()
+    const success = saveFileLocally()
     if (success) {
       addToRecentFiles(fileName)
       toast({
         title: "File saved",
         description: `${fileName} has been saved successfully.`
+      })
+    }
+  }
+
+  const handleDownload = () => {
+    const success = saveFile()
+    if (success) {
+      toast({
+        title: "File downloaded",
+        description: `${fileName} has been downloaded successfully.`
       })
     }
   }
@@ -50,15 +62,23 @@ function Menu() {
   }
 
   const handleOpenFile = () => {
+    // Save current file content before opening new file
+    if (text && text.trim() && fileName) {
+      safeStorage.set(`marky-file-${fileName}`, text)
+    }
+    
     const input = document.createElement('input')
     input.type = 'file'
-    input.accept = '.md,.txt'
+    input.accept = '.md'
     input.onchange = (e) => {
       const file = e.target.files[0]
-      if (file && validateFilename(file.name)) {
+      if (file) {
         const reader = new FileReader()
         reader.onload = (e) => {
-          loadFile(e.target.result, file.name)
+          const content = e.target.result
+          loadFile(content, file.name)
+          // Save the loaded content to individual file storage
+          safeStorage.set(`marky-file-${file.name}`, content)
           addToRecentFiles(file.name)
           toast({
             title: "File opened",
@@ -66,12 +86,6 @@ function Menu() {
           })
         }
         reader.readAsText(file)
-      } else {
-        toast({
-          title: "Invalid file",
-          description: "Please select a valid file.",
-          variant: "destructive"
-        })
       }
     }
     input.click()
@@ -88,11 +102,68 @@ function Menu() {
   }
 
   const addToRecentFiles = (filename) => {
-    if (!validateFilename(filename)) return
+    if (!filename || !filename.trim()) return
     
     const updated = [filename, ...recentFiles.filter(f => f !== filename)].slice(0, 5)
     setRecentFiles(updated)
     safeStorage.set('marky-recent-files', updated)
+  }
+
+  const removeFromRecentFiles = (filename) => {
+    const updated = recentFiles.filter(f => f !== filename)
+    setRecentFiles(updated)
+    safeStorage.set('marky-recent-files', updated)
+    toast({
+      title: "File removed",
+      description: `${filename} removed from recent files.`
+    })
+  }
+
+  const handleRecentFileClick = (filename) => {
+    // Save current file content before switching
+    const currentText = text
+    const currentFileName = fileName
+    if (currentText && currentText.trim() && currentFileName !== filename) {
+      safeStorage.set(`marky-file-${currentFileName}`, currentText)
+    }
+    
+    // Load file content from localStorage if available
+    const savedContent = safeStorage.get(`marky-file-${filename}`)
+    if (savedContent) {
+      loadFile(savedContent, filename)
+      addToRecentFiles(filename)
+      toast({
+        title: "File opened",
+        description: `${filename} has been opened.`
+      })
+    } else {
+      // If no saved content, just set the filename
+      setFileName(filename)
+      setText("# " + filename.replace(/\.[^/.]+$/, "") + "\n\nStart writing here...")
+      addToRecentFiles(filename)
+      toast({
+        title: "File opened",
+        description: `${filename} has been created.`
+      })
+    }
+  }
+
+  const handleRecentFileContextMenu = (e, filename) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    setContextMenu({
+      isOpen: true,
+      position: {
+        x: e.clientX,
+        y: e.clientY
+      },
+      fileName: filename
+    })
+  }
+
+  const closeContextMenu = () => {
+    setContextMenu({ isOpen: false, position: { x: 0, y: 0 }, fileName: '' })
   }
 
   return (
@@ -141,16 +212,35 @@ function Menu() {
                 variant="ghost"
                 size="sm"
                 className="w-full justify-start text-xs h-8"
-                onClick={() => {
-                  setFileName(file)
-                  // Load file content if available
-                }}
+                onClick={() => handleRecentFileClick(file)}
+                onContextMenu={(e) => handleRecentFileContextMenu(e, file)}
               >
                 {file}
               </Button>
             ))}
           </CardContent>
         </Card>
+      )}
+      
+      {contextMenu.isOpen && (
+        <RecentFileContextMenu
+          isOpen={contextMenu.isOpen}
+          position={contextMenu.position}
+          onClose={closeContextMenu}
+          fileName={contextMenu.fileName}
+          onRemove={removeFromRecentFiles}
+          onOpen={handleRecentFileClick}
+          onRename={(oldName, newName) => {
+            // Update the filename in recent files
+            const updated = recentFiles.map(f => f === oldName ? newName : f)
+            setRecentFiles(updated)
+            safeStorage.set('marky-recent-files', updated)
+            toast({
+              title: "File renamed in recent files",
+              description: `${oldName} renamed to ${newName}`
+            })
+          }}
+        />
       )}
     </div>
   )

@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect } from "react"
 import { saveAs } from "file-saver"
 import { useToast } from "@/components/ui/use-toast"
+import { safeStorage } from '@/lib/security'
 
 const FileContext = createContext()
 
@@ -10,7 +11,20 @@ export function FileContextProvider({ children }) {
   const [isDirty, setIsDirty] = useState(false)
   const { toast } = useToast()
 
-  const extension = fileName.split(".").reverse()[0]
+  // Get file extension, handle cases where there's no extension or special names
+  const getExtension = (name) => {
+    if (!name) return "md"
+    
+    // Handle base64-like names
+    if (name.includes("TMV3IERVY3VTZW50LM1K")) {
+      return "md"
+    }
+    
+    const parts = name.split(".")
+    return parts.length > 1 ? parts[parts.length - 1].toLowerCase() : "md"
+  }
+
+  const extension = getExtension(fileName)
 
   // Track if document has unsaved changes
   useEffect(() => {
@@ -25,6 +39,24 @@ export function FileContextProvider({ children }) {
     const blob = new Blob([text], { type: 'text/markdown;charset=utf-8' })
     try {
       saveAs(blob, fileName)
+      setIsDirty(false)
+      return true
+    } catch (e) {
+      toast({
+        title: "Save failed",
+        description: e.message,
+        variant: "destructive"
+      })
+      return false
+    }
+  }
+
+  function saveFileLocally() {
+    try {
+      // Save to localStorage
+      safeStorage.set(`marky-file-${fileName}`, text)
+      safeStorage.set('marky-autosave', text)
+      safeStorage.set('marky-filename', fileName)
       setIsDirty(false)
       return true
     } catch (e) {
@@ -90,6 +122,7 @@ export function FileContextProvider({ children }) {
     setText,
     extension,
     saveFile,
+    saveFileLocally,
     exportAsHTML,
     newFile,
     loadFile,
