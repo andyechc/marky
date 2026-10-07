@@ -2,130 +2,377 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ---------------------------------------------------------------------------
+   Design tokens. Every colour in the app resolves through these variables, so a
+   theme is just a block of overrides on [data-theme]. Contrast pairs were
+   chosen to clear WCAG AA (4.5:1 body text, 3:1 UI borders) in all three.
+--------------------------------------------------------------------------- */
 @layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 0 84.2% 60.2%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 0 84.2% 60.2%;
-    --radius: 0.5rem;
+  /*
+   * A native modal paints `::backdrop`, which Tailwind's utilities never touch,
+   * so it defaults to a fully transparent overlay: the page behind stays sharp
+   * and readable right up to the dialog edge, which reads as a rendering bug.
+   */
+  dialog::backdrop {
+    background-color: hsl(var(--foreground) / 0.45);
+    backdrop-filter: blur(2px);
+  }
+  :root,
+  [data-theme='light'] {
+    color-scheme: light;
+
+    --bg: 40 20% 99%;
+    --surface: 0 0% 100%;
+    --surface-2: 40 12% 96.5%;
+    --surface-3: 40 10% 93%;
+    --fg: 222 30% 12%;
+    --fg-muted: 220 9% 42%;
+    --border: 220 13% 89%;
+    --border-strong: 220 13% 80%;
+
+    --primary: 4 74% 52%;
+    --primary-fg: 0 0% 100%;
+    --accent: 4 74% 52%;
+    --accent-fg: 0 0% 100%;
+    --destructive: 0 72% 45%;
+    --success: 152 60% 30%;
+    --ring: 4 74% 52%;
+
+    --selection: 4 74% 52% / 0.16;
+    --shadow-sm: 0 1px 2px 0 hsl(222 30% 12% / 0.05);
+    --shadow-md: 0 4px 16px -4px hsl(222 30% 12% / 0.12), 0 1px 3px hsl(222 30% 12% / 0.06);
+    --shadow-lg: 0 24px 48px -12px hsl(222 30% 12% / 0.18);
+
+    --radius: 0.625rem;
   }
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 0 84.2% 60.2%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 0 84.2% 60.2%;
-  }
-}
+  [data-theme='dark'] {
+    color-scheme: dark;
 
-@layer base {
+    --bg: 222 24% 8%;
+    --surface: 222 22% 11%;
+    --surface-2: 222 20% 15%;
+    --surface-3: 222 18% 19%;
+    --fg: 210 20% 96%;
+    --fg-muted: 217 12% 66%;
+    --border: 222 16% 21%;
+    --border-strong: 222 14% 32%;
+
+    --primary: 4 82% 63%;
+    --primary-fg: 222 30% 8%;
+    --accent: 4 82% 63%;
+    --accent-fg: 222 30% 8%;
+    --destructive: 0 72% 62%;
+    --success: 152 55% 55%;
+    --ring: 4 82% 63%;
+
+    --selection: 4 82% 63% / 0.26;
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.3);
+    --shadow-md: 0 4px 16px -4px hsl(0 0% 0% / 0.5), 0 1px 3px hsl(0 0% 0% / 0.3);
+    --shadow-lg: 0 24px 48px -12px hsl(0 0% 0% / 0.65);
+
+    --radius: 0.625rem;
+  }
+
+  [data-theme='sepia'] {
+    color-scheme: light;
+
+    --bg: 40 34% 93%;
+    --surface: 40 40% 97%;
+    --surface-2: 40 26% 91%;
+    --surface-3: 40 22% 86%;
+    --fg: 30 22% 18%;
+    --fg-muted: 30 12% 40%;
+    --border: 36 22% 82%;
+    --border-strong: 36 20% 68%;
+
+    --primary: 12 62% 40%;
+    --primary-fg: 40 40% 97%;
+    --accent: 12 62% 40%;
+    --accent-fg: 40 40% 97%;
+    --destructive: 0 62% 40%;
+    --success: 152 45% 27%;
+    --ring: 12 62% 40%;
+
+    --selection: 12 62% 40% / 0.18;
+    --shadow-sm: 0 1px 2px 0 hsl(30 22% 18% / 0.06);
+    --shadow-md: 0 4px 16px -4px hsl(30 22% 18% / 0.14), 0 1px 3px hsl(30 22% 18% / 0.07);
+    --shadow-lg: 0 24px 48px -12px hsl(30 22% 18% / 0.2);
+
+    --radius: 0.625rem;
+  }
+
   * {
     @apply border-border;
   }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scrollbar-gutter: stable;
+  }
+
   body {
     @apply bg-background text-foreground;
+    font-family: theme('fontFamily.sans');
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior: none;
+  }
+
+  /* Respect the OS reduced-motion setting everywhere, not per-component. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  ::selection {
+    background-color: hsl(var(--selection));
+  }
+
+  /* A single, consistent focus ring. Never remove without a replacement. */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  /* Slim scrollbars that follow the theme. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border-strong)) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border-strong));
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--fg-muted));
   }
 }
 
-/* Custom prose styles for better theme support */
 @layer components {
-  .prose {
+  /* Hides content visually but keeps it in the accessibility tree. Focusable
+     children opt back out so skip links can appear on focus. */
+  .visually-hidden:where(:not(:focus-within, :active)) {
+    position: absolute !important;
+    clip-path: inset(50%) !important;
+    overflow: hidden !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    white-space: nowrap !important;
+  }
+
+  .skip-link {
+    @apply absolute left-4 top-3 z-[200] rounded-md bg-primary px-4 py-2
+      text-sm font-medium text-primary-foreground shadow-md;
+    transform: translateY(calc(-100% - 1rem));
+    transition: transform 0.16s theme('transitionTimingFunction.spring');
+  }
+  .skip-link:focus {
+    transform: translateY(0);
+  }
+
+  /* -------------------------------------------------------------------------
+     Markdown preview. Uses the token variables directly so it inherits the
+     active theme instead of relying on prose-* colour classes.
+  ------------------------------------------------------------------------- */
+  .prose-markdown {
+    @apply text-foreground max-w-none;
+    font-size: var(--preview-font-size, 1rem);
+    line-height: 1.7;
+  }
+
+  .prose-markdown > * + * {
+    @apply mt-5;
+  }
+
+  .prose-markdown h1,
+  .prose-markdown h2,
+  .prose-markdown h3,
+  .prose-markdown h4 {
+    @apply text-foreground scroll-mt-6 font-semibold tracking-tight;
+    text-wrap: balance;
+  }
+  .prose-markdown h1 {
+    @apply mt-0 text-[1.9em] font-bold leading-tight;
+  }
+  .prose-markdown h2 {
+    @apply mt-10 text-[1.45em] leading-snug;
+  }
+  .prose-markdown h3 {
+    @apply mt-8 text-[1.2em] leading-snug;
+  }
+  .prose-markdown h4 {
+    @apply mt-6 text-[1.02em];
+  }
+  .prose-markdown h5,
+  .prose-markdown h6 {
+    @apply mt-6 text-foreground text-[0.95em] uppercase tracking-wide text-muted-foreground;
+  }
+
+  .prose-markdown p {
     @apply text-foreground;
+    text-wrap: pretty;
   }
-  
-  .prose h1,
-  .prose h2,
-  .prose h3,
-  .prose h4,
-  .prose h5,
-  .prose h6 {
+
+  .prose-markdown a {
+    @apply text-primary font-medium underline decoration-primary/35
+      underline-offset-[3px] transition-colors;
+  }
+  .prose-markdown a:hover {
+    @apply decoration-primary;
+  }
+
+  /* Heading self-links are revealed on hover. These need to out-specify
+     `.prose-markdown a` above, so they are declared here rather than as
+     utilities on the element. */
+  .prose-markdown :is(h1, h2, h3, h4) > a[href^='#'] {
+    @apply ml-2 select-none text-muted-foreground/0 no-underline transition-colors;
+  }
+  .prose-markdown :is(h1, h2, h3, h4):hover > a[href^='#'],
+  .prose-markdown :is(h1, h2, h3, h4) > a[href^='#']:focus-visible {
+    @apply text-muted-foreground/60;
+  }
+
+  .prose-markdown strong {
+    @apply text-foreground font-semibold;
+  }
+
+  .prose-markdown ul {
+    @apply my-5 list-disc space-y-2 pl-6 marker:text-muted-foreground;
+  }
+  .prose-markdown ol {
+    @apply my-5 list-decimal space-y-2 pl-6 marker:text-muted-foreground;
+  }
+  .prose-markdown li > ul,
+  .prose-markdown li > ol {
+    @apply my-1;
+  }
+  .prose-markdown li::marker {
+    @apply text-muted-foreground;
+  }
+
+  .prose-markdown blockquote {
+    @apply border-primary/60 text-muted-foreground my-5 border-l-[3px] py-1 pl-5 italic;
+  }
+  .prose-markdown blockquote p {
+    @apply text-muted-foreground;
+  }
+
+  .prose-markdown code {
+    @apply border-border bg-surface-muted rounded border px-[0.35em] py-[0.15em]
+      font-mono text-[0.87em] font-normal text-foreground;
+    word-break: break-word;
+  }
+
+  .prose-markdown pre {
+    @apply bg-surface-muted my-5 overflow-x-auto rounded-lg border p-4 text-[0.875em] leading-relaxed;
+  }
+  .prose-markdown pre code {
+    @apply border-0 bg-transparent p-0 text-[1em] text-foreground;
+  }
+
+  .prose-markdown table {
+    @apply border-border my-5 block w-full overflow-x-auto border-collapse text-sm;
+  }
+  .prose-markdown thead {
+    @apply bg-surface-muted;
+  }
+  .prose-markdown th {
+    @apply border-border text-foreground border px-3 py-2 text-left font-semibold;
+  }
+  .prose-markdown td {
+    @apply border-border border px-3 py-2 align-top;
+  }
+  .prose-markdown tbody tr:nth-child(even) {
+    @apply bg-surface-muted/45;
+  }
+
+  .prose-markdown img {
+    @apply border-border my-5 rounded-lg border;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .prose-markdown hr {
+    @apply border-border my-8 border-t;
+  }
+
+  /*
+   * Task lists. react-markdown emits <li class="task-list-item"><input> text</li>
+   * with the label as a bare text node, so an inline checkbox with a gap lines
+   * up on the same baseline without absolute positioning.
+   */
+  .prose-markdown li.task-list-item {
+    @apply list-none p-0;
+  }
+  .prose-markdown input[type='checkbox'] {
+    @apply border-border-strong mr-2 h-[1.05em] w-[1.05em] shrink-0 translate-y-[0.18em] rounded accent-primary;
+  }
+
+  .prose-markdown kbd {
+    @apply border-border bg-surface-muted rounded border px-1.5 py-0.5 font-mono text-[0.8em];
+  }
+
+  /* Standalone document styling for exported HTML. */
+  .prose-export {
     @apply text-foreground;
-  }
-  
-  .prose p {
-    @apply text-foreground;
-  }
-  
-  .prose ul,
-  .prose ol {
-    @apply text-foreground;
-  }
-  
-  .prose li {
-    @apply text-foreground;
-  }
-  
-  .prose blockquote {
-    @apply text-foreground;
-  }
-  
-  .prose code {
-    @apply text-foreground;
-  }
-  
-  .prose pre {
-    @apply text-foreground;
-  }
-  
-  .prose a {
-    @apply text-red-600 hover:text-red-700;
-  }
-  
-  .prose strong {
-    @apply text-foreground;
-  }
-  
-  .prose em {
-    @apply text-foreground;
-  }
-  
-  .prose table {
-    @apply text-foreground;
-  }
-  
-  .prose th,
-  .prose td {
-    @apply text-foreground border-border;
+    max-width: 72ch;
+    margin-inline: auto;
   }
 }
 
-@font-face {
-  font-family: "FiraCode";
-  src: url("/src/fonts/FiraCode-Regular.ttf");
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Thin, unobtrusive scroll area used inside panes. */
+  .scroll-area {
+    scrollbar-gutter: stable;
+  }
 }
 
+/*
+ * Only the editor's monospace face is self-hosted, and only when the user
+ * actually uses it. `font-display: swap` keeps text readable while it loads,
+ * and the system mono stack is a reasonable interim.
+ */
 @font-face {
-  font-family: "Museo";
-  src: url("/src/fonts/MuseoModerno-Regular.ttf");
+  font-family: 'Fira Code';
+  src: url('/src/fonts/FiraCode-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+/*
+ * Closed dialogs must not render.
+ *
+ * Deliberately unlayered. The user-agent rule that does this,
+ * `dialog:not([open]) { display: none }`, is author-origin-beaten by any
+ * Tailwind `display` utility on the element — and Tailwind emits those into
+ * `@layer utilities`, which unlayered author styles outrank. A single `flex`
+ * class on <dialog> therefore made every modal in the app render at once,
+ * stacked on top of each other.
+ */
+dialog:not([open]) {
+  display: none;
 }

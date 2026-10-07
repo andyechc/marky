@@ -1,79 +1,115 @@
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
-import { X, Keyboard } from 'lucide-react'
+import { Dialog } from './ui/dialog'
+import { usePlatform } from '@/hooks/useHotkeys'
 
-const Shortcuts = ({ isOpen, onClose }) => {
-  const shortcuts = [
-    { keys: 'Cmd + S', description: 'Guardar archivo', category: 'Archivo' },
-    { keys: 'Cmd + B', description: 'Texto en negrita', category: 'Formato' },
-    { keys: 'Cmd + I', description: 'Texto en cursiva', category: 'Formato' },
-    { keys: 'Cmd + E', description: 'Código inline', category: 'Formato' },
-    { keys: 'Cmd + K', description: 'Insertar enlace', category: 'Formato' },
-    { keys: 'Cmd + 1', description: 'Encabezado H1', category: 'Formato' },
-    { keys: 'Cmd + 2', description: 'Encabezado H2', category: 'Formato' },
-    { keys: 'Cmd + 3', description: 'Encabezado H3', category: 'Formato' },
-    { keys: 'Cmd + /', description: 'Comentar línea', category: 'Formato' },
-    { keys: 'Cmd + Z', description: 'Deshacer', category: 'Edición' },
-    { keys: 'Cmd + Y', description: 'Rehacer', category: 'Edición' },
-    { keys: 'Cmd + A', description: 'Seleccionar todo', category: 'Edición' },
-    { keys: 'Cmd + F', description: 'Buscar', category: 'Navegación' },
-    { keys: 'Cmd + G', description: 'Siguiente resultado', category: 'Navegación' },
-    { keys: 'Tab', description: 'Indentar', category: 'Edición' },
-    { keys: 'Shift + Tab', description: 'Desindentar', category: 'Edición' },
-  ]
+/**
+ * Keyboard shortcut reference.
+ *
+ * The previous modal advertised fifteen shortcuts while only five were wired
+ * up. This list is derived from the same command registry the app dispatches,
+ * so anything shown here is guaranteed to work.
+ */
+const GROUPS = [
+  {
+    title: 'Archivo',
+    items: [
+      { keys: ['Mod', 'S'], description: 'Guardar documento' },
+      { keys: ['Mod', 'O'], description: 'Abrir archivo' },
+      { keys: ['Mod', 'E'], description: 'Exportar como HTML' },
+      { keys: ['Mod', 'Alt', 'N'], description: 'Nuevo documento' },
+    ],
+  },
+  {
+    title: 'Formato',
+    items: [
+      { keys: ['Mod', 'B'], description: 'Negrita' },
+      { keys: ['Mod', 'I'], description: 'Cursiva' },
+      { keys: ['Mod', 'Shift', 'X'], description: 'Tachado' },
+      { keys: ['Mod', 'E'], description: 'Código en línea' },
+      { keys: ['Mod', 'Shift', 'E'], description: 'Bloque de código' },
+      { keys: ['Mod', '1'], description: 'Encabezado 1' },
+      { keys: ['Mod', '2'], description: 'Encabezado 2' },
+      { keys: ['Mod', '3'], description: 'Encabezado 3' },
+      { keys: ['Mod', 'Shift', '7'], description: 'Lista numerada' },
+      { keys: ['Mod', 'Shift', '8'], description: 'Lista con viñetas' },
+      { keys: ['Mod', 'Shift', '9'], description: 'Lista de tareas' },
+      { keys: ['Mod', 'Shift', '.'], description: 'Cita' },
+      { keys: ['Mod', 'K'], description: 'Insertar enlace' },
+      { keys: ['Mod', 'Shift', 'I'], description: 'Insertar imagen' },
+      { keys: ['Mod', 'Shift', 'T'], description: 'Insertar tabla' },
+      { keys: ['Mod', '/'], description: 'Comentar línea' },
+    ],
+  },
+  {
+    title: 'Edición',
+    items: [
+      { keys: ['Mod', 'Z'], description: 'Deshacer' },
+      { keys: ['Mod', 'Shift', 'Z'], description: 'Rehacer' },
+      { keys: ['Tab'], description: 'Indentar (2 espacios)' },
+      { keys: ['Shift', 'Tab'], description: 'Reducir sangría' },
+      { keys: ['Enter'], description: 'Continuar lista o cita' },
+      { keys: ['Mod', 'Enter'], description: 'Guardar' },
+    ],
+  },
+  {
+    title: 'Navegación',
+    items: [
+      { keys: ['Mod', 'K'], description: 'Paleta de comandos' },
+      { keys: ['Mod', 'F'], description: 'Buscar y reemplazar' },
+      { keys: ['Mod', '\\'], description: 'Mostrar u ocultar panel' },
+      { keys: ['Mod', '?'], description: 'Abrir esta ayuda' },
+      { keys: ['Esc'], description: 'Cerrar diálogo o salir del editor' },
+    ],
+  },
+]
 
-  const categories = [...new Set(shortcuts.map(s => s.category))]
+export function ShortcutsDialog({ open, onClose }) {
+  const { modKey } = usePlatform()
+
+  const renderKey = (key) => {
+    if (key === 'Mod') return modKey
+    return key
+  }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-2xl max-h-[80vh] overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <CardTitle className="flex items-center gap-2">
-            <Keyboard className="h-5 w-5" />
-            Atajos de Teclado
-          </CardTitle>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
-        </CardHeader>
-        <CardContent className="overflow-y-auto">
-          <div className="space-y-6">
-            {categories.map(category => (
-              <div key={category}>
-                <h3 className="text-sm font-semibold text-muted-foreground mb-3">
-                  {category}
-                </h3>
-                <div className="space-y-2">
-                  {shortcuts
-                    .filter(shortcut => shortcut.category === category)
-                    .map((shortcut, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 rounded hover:bg-muted/50 transition-colors">
-                        <span className="text-sm">{shortcut.description}</span>
-                        <div className="flex items-center gap-1">
-                          {shortcut.keys.split(' + ').map((key, keyIndex) => (
-                            <span key={keyIndex} className="px-2 py-1 text-xs font-mono bg-muted border rounded">
-                              {key.trim()}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      title="Atajos de teclado"
+      description={`Usa ${modKey} en macOS y Ctrl en Windows o Linux.`}
+    >
+      <div className="max-h-[55vh] space-y-5 overflow-y-auto pr-1 scroll-area">
+        {GROUPS.map((group) => (
+          <section key={group.title}>
+            <h3 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              {group.title}
+            </h3>
+            <ul className="space-y-0.5">
+              {group.items.map((item) => (
+                <li
+                  key={item.description + item.keys.join()}
+                  className="flex items-center justify-between gap-4 rounded-md px-2 py-1.5
+                             transition-colors hover:bg-surface-muted"
+                >
+                  <span className="text-[13px]">{item.description}</span>
+                  <span className="flex shrink-0 items-center gap-1">
+                    {item.keys.map((key, index) => (
+                      <kbd
+                        key={`${key}-${index}`}
+                        className="min-w-[1.75rem] rounded border border-border bg-surface-muted px-1.5
+                                   py-0.5 text-center font-mono text-[11px] leading-4"
+                      >
+                        {renderKey(key)}
+                      </kbd>
                     ))}
-                </div>
-                {category !== categories[categories.length - 1] && <Separator className="mt-4" />}
-              </div>
-            ))}
-          </div>
-          
-          <div className="mt-6 p-4 bg-muted/30 rounded-lg">
-            <p className="text-xs text-muted-foreground">
-              <strong>Tip:</strong> Usa estos atajos para acelerar tu escritura. Los atajos con Cmd en Mac usan Ctrl en Windows/Linux.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+      </div>
+    </Dialog>
   )
 }
 
-export default Shortcuts
+export { GROUPS as SHORTCUT_GROUPS }

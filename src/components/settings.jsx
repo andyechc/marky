@@ -1,109 +1,256 @@
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
-import { X, Save, FileText, Moon, Sun } from 'lucide-react'
-import { useToast } from '@/components/ui/use-toast'
-import { useSettings } from '@/hooks/useSettings'
+import { useState } from 'react'
+import { RotateCcw, Trash2 } from 'lucide-react'
+import { Dialog } from './ui/dialog'
+import { Button } from './ui/button'
+import { useSettings, THEMES, FONT_SIZES } from '@/context/settingsContext'
+import { storage, isStorageAvailable } from '@/lib/storage'
+import { cn } from '@/lib/utils'
 
-const Settings = ({ isOpen, onClose }) => {
-  const { settings, updateSettings, resetSettings } = useSettings()
-  const { toast } = useToast()
-
-  const handleSave = () => {
-    toast({
-      title: "Settings saved",
-      description: "Your preferences have been saved successfully."
-    })
-    onClose()
-  }
-
-  const handleReset = () => {
-    resetSettings()
-    toast({
-      title: "Settings reset",
-      description: "All settings have been reset to defaults."
-    })
-  }
-
+/** Labelled row with a description, used throughout the dialog. */
+function Row({ title, description, children, htmlFor }) {
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <Card className="w-full max-w-md mx-4">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <CardTitle>Settings</CardTitle>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <label className="text-sm font-medium">Dark Mode</label>
-                <p className="text-xs text-muted-foreground">
-                  Toggle dark/light theme
-                </p>
-              </div>
-              <Button
-                variant={settings.isDark ? "default" : "outline"}
-                size="sm"
-                onClick={() => updateSettings({ isDark: !settings.isDark })}
-              >
-                {settings.isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-              </Button>
-            </div>
-
-            <Separator />
-
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <label className="text-sm font-medium">Auto-save</label>
-                <p className="text-xs text-muted-foreground">
-                  Automatically save changes
-                </p>
-              </div>
-              <Button
-                variant={settings.autoSave ? "default" : "outline"}
-                size="sm"
-                onClick={() => updateSettings({ autoSave: !settings.autoSave })}
-              >
-                {settings.autoSave ? "On" : "Off"}
-              </Button>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Font Size</label>
-              <div className="flex gap-2">
-                {['small', 'medium', 'large'].map((size) => (
-                  <Button
-                    key={size}
-                    variant={settings.fontSize === size ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => updateSettings({ fontSize: size })}
-                  >
-                    {size.charAt(0).toUpperCase() + size.slice(1)}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <Separator />
-
-          <div className="flex justify-between">
-            <Button variant="outline" onClick={handleReset}>
-              Reset to Defaults
-            </Button>
-            <Button onClick={handleSave}>
-              <Save className="h-4 w-4 mr-2" />
-              Save Settings
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="flex items-start justify-between gap-6 py-3">
+      <div className="min-w-0">
+        <label htmlFor={htmlFor} className="block text-sm font-medium">
+          {title}
+        </label>
+        {description && (
+          <p className="mt-0.5 text-[12.5px] leading-relaxed text-muted-foreground">{description}</p>
+        )}
+      </div>
+      <div className="shrink-0 pt-0.5">{children}</div>
     </div>
   )
 }
 
-export default Settings
+/**
+ * Switch built on a native button.
+ *
+ * The knob needs an explicit `left`/`top`. Without them an absolutely
+ * positioned child falls back to its static position, and buttons are
+ * `text-align: center` by default — so the knob started centred and the
+ * translate pushed it clear outside the track.
+ *
+ * Track 40x24 with a 1px border, knob 18: a 3px inset leaves a 14px travel, and
+ * the knob sits symmetrically at 3px from whichever end it is nearest.
+ */
+const KNOB_TRAVEL = 'translate-x-[14px]'
+
+function Switch({ id, checked, onChange, label }) {
+  return (
+    <button
+      type="button"
+      id={id}
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
+      onClick={() => onChange(!checked)}
+      className={cn(
+        'relative h-6 w-10 shrink-0 rounded-full border transition-colors duration-200',
+        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
+        'focus-visible:outline-ring',
+        checked ? 'border-primary bg-primary' : 'border-border bg-surface-subtle',
+      )}
+    >
+      <span
+        aria-hidden="true"
+        className={cn(
+            // The hairline keeps the knob readable against the pale
+            // "off" track, where a plain white circle nearly disappears.
+            'absolute left-[3px] top-[3px] h-[18px] w-[18px] rounded-full bg-white',
+            'shadow-sm ring-1 ring-inset ring-foreground/10',
+            'transition-transform duration-200 ease-spring',
+          checked ? KNOB_TRAVEL : 'translate-x-0',
+        )}
+      />
+    </button>
+  )
+}
+
+/** Segmented radio group for mutually exclusive options. */
+function Segmented({ id, options, value, onChange }) {
+  return (
+    <div role="radiogroup" aria-labelledby={id} className="flex rounded-md border border-border p-0.5">
+      {options.map((option) => (
+        <button
+          key={option.id}
+          type="button"
+          role="radio"
+          aria-checked={value === option.id}
+          onClick={() => onChange(option.id)}
+          className={cn(
+            'rounded px-2.5 py-1 text-[13px] transition-colors',
+            'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring',
+            value === option.id
+              ? 'bg-surface-muted font-medium text-foreground'
+              : 'text-muted-foreground hover:text-foreground',
+          )}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+export function SettingsDialog({ open, onClose, onClearData, storageAvailable }) {
+  const { settings, update, reset } = useSettings()
+  const [confirming, setConfirming] = useState(false)
+
+  const usage = storage.usage()
+  const usageLabel = usage > 1024 * 1024
+    ? `${(usage / (1024 * 1024)).toFixed(1)} MB`
+    : `${Math.max(1, Math.round(usage / 1024))} KB`
+
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      title="Ajustes"
+      description="Se guardan en este navegador."
+      contentClassName="max-h-[60vh] overflow-y-auto scroll-area"
+    >
+      <section>
+        <h3 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          Apariencia
+        </h3>
+
+        <Row title="Tema" description="Cambia el aspecto del editor y la vista previa.">
+          <Segmented
+            id="theme-setting"
+            options={THEMES}
+            value={settings.theme}
+            onChange={(theme) => update({ theme })}
+          />
+        </Row>
+
+        <Row title="Tamaño en el editor" description="Tamaño de fuente del área de escritura.">
+          <Segmented
+            id="editor-font-setting"
+            options={FONT_SIZES.map((f) => ({ id: f.id, label: f.label }))}
+            value={settings.editorFontSize}
+            onChange={(editorFontSize) => update({ editorFontSize })}
+          />
+        </Row>
+
+        <Row title="Tamaño en la vista previa" description="Tamaño de fuente del texto renderizado.">
+          <Segmented
+            id="preview-font-setting"
+            options={FONT_SIZES.map((f) => ({ id: f.id, label: f.label }))}
+            value={settings.previewFontSize}
+            onChange={(previewFontSize) => update({ previewFontSize })}
+          />
+        </Row>
+      </section>
+
+      <div className="my-4 h-px bg-border" />
+
+      <section>
+        <h3 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          Editor
+        </h3>
+
+        <Row
+          title="Autoguardado"
+          description="Guarda una copia del borrador mientras escribes."
+        >
+          <Switch
+            id="autosave-setting"
+            checked={settings.autoSave}
+            onChange={(autoSave) => update({ autoSave })}
+            label="Autoguardado"
+          />
+        </Row>
+
+        <Row title="Números de línea" description="Muestra el número de cada línea a la izquierda.">
+          <Switch
+            id="line-numbers-setting"
+            checked={settings.showLineNumbers}
+            onChange={(showLineNumbers) => update({ showLineNumbers })}
+            label="Números de línea"
+          />
+        </Row>
+
+        <Row
+          title="Sincronizar scroll"
+          description="Al desplazarte en el editor, la vista previa sigue el mismo porcentaje."
+        >
+          <Switch
+            id="scroll-sync-setting"
+            checked={settings.syncScroll}
+            onChange={(syncScroll) => update({ syncScroll })}
+            label="Sincronizar scroll"
+          />
+        </Row>
+
+        <Row title="Corrector ortográfico" description="Subrayado nativo del navegador.">
+          <Switch
+            id="spellcheck-setting"
+            checked={settings.spellcheck}
+            onChange={(spellcheck) => update({ spellcheck })}
+            label="Corrector ortográfico"
+          />
+        </Row>
+
+        <Row title="Panel lateral" description="Esquema del documento y archivos recientes.">
+          <Switch
+            id="sidebar-setting"
+            checked={settings.showSidebar}
+            onChange={(showSidebar) => update({ showSidebar })}
+            label="Panel lateral"
+          />
+        </Row>
+      </section>
+
+      <div className="my-4 h-px bg-border" />
+
+      <section>
+        <h3 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          Datos
+        </h3>
+
+        <div className="py-2 text-[12.5px] text-muted-foreground">
+          Espacio usado: <span className="font-medium text-foreground">{usageLabel}</span>
+          {!storageAvailable && (
+            <p className="mt-1 text-destructive">
+              Este navegador bloquea el almacenamiento local, así que nada se guardará al cerrar.
+            </p>
+          )}
+        </div>
+
+        <div className="flex flex-wrap gap-2 py-2">
+          <Button variant="outline" size="sm" onClick={reset}>
+            <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+            Restablecer preferencias
+          </Button>
+
+          {confirming ? (
+            <span className="flex items-center gap-2">
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => {
+                  onClearData?.()
+                  setConfirming(false)
+                }}
+              >
+                <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                Borrar todo
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => setConfirming(false)}>
+                Cancelar
+              </Button>
+            </span>
+          ) : (
+            <Button variant="ghost" size="sm" onClick={() => setConfirming(true)}>
+              <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+              Borrar datos locales
+            </Button>
+          )}
+        </div>
+      </section>
+    </Dialog>
+  )
+}
+
+export { isStorageAvailable }

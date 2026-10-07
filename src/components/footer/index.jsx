@@ -1,94 +1,115 @@
-import { useState, useEffect, useContext } from "react"
-import { FileContext } from '/src/context/fileContext'
-import { Card } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
-import { FileText, Clock, Hash, Zap } from 'lucide-react'
+import { useMemo } from 'react'
+import { Hash, Clock3, FileText } from 'lucide-react'
+import { useSettings } from '@/context/settingsContext'
+import { cn } from '@/lib/utils'
 
-function Footer() {
-  const { text, fileName } = useContext(FileContext)
-  const [stats, setStats] = useState({
-    characters: 0,
-    words: 0,
-    lines: 0,
-    readingTime: 0,
-    size: '0 bytes'
-  })
+const WORDS_PER_MINUTE = 200
 
-  useEffect(() => {
-    if (text) {
-      const characters = text.length
-      const words = text.trim() ? text.trim().split(/\s+/).length : 0
-      const lines = text.split('\n').length
-      const readingTime = Math.ceil(words / 200) // Average reading speed
-      
-      let size
-      if (characters >= 1024 * 1024) {
-        size = `${(characters / (1024 * 1024)).toFixed(2)} MB`
-      } else if (characters >= 1024) {
-        size = `${(characters / 1024).toFixed(1)} KB`
-      } else {
-        size = `${characters} bytes`
-      }
+/** Computes word/character/line counts and a reading estimate. */
+export function getStats(text) {
+  const trimmed = text.trim()
+  const words = trimmed ? trimmed.split(/\s+/).length : 0
+  const characters = text.length
+  const lines = text.split('\n').length
+  const sentences = (text.match(/[.!?]+(\s|$)/g) ?? []).length
+  return {
+    words,
+    characters,
+    lines,
+    sentences,
+    readingMinutes: Math.max(1, Math.round(words / WORDS_PER_MINUTE)) || 0,
+    bytes: new Blob([text]).size,
+  }
+}
 
-      setStats({
-        characters,
-        words,
-        lines,
-        readingTime,
-        size
-      })
-    } else {
-      setStats({
-        characters: 0,
-        words: 0,
-        lines: 0,
-        readingTime: 0,
-        size: '0 bytes'
-      })
-    }
-  }, [text])
+function formatBytes(bytes) {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`
+}
+
+/**
+ * Status bar. Shows live counts and the save state.
+ *
+ * The save indicator uses an icon and text, not colour alone, so the state is
+ * legible without colour perception.
+ */
+export function StatusBar({ text, fileName, isDirty, onRename }) {
+  const { settings, update } = useSettings()
+  const stats = useMemo(() => getStats(text), [text])
+
+  const saveState = isDirty ? 'Sin guardar' : 'Guardado'
 
   return (
-    <footer className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-10 items-center px-4">
-        <div className="flex flex-1 items-center justify-between text-xs text-muted-foreground">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-1">
-              <FileText className="h-3 w-3" />
-              <span>{fileName}</span>
-            </div>
-            
-            <Separator orientation="vertical" className="h-4" />
-            
-            <div className="flex items-center space-x-1">
-              <Hash className="h-3 w-3" />
-              <span>{stats.words} words</span>
-            </div>
-            
-            <div className="flex items-center space-x-1">
-              <span>{stats.characters} chars</span>
-            </div>
-            
-            <div className="flex items-center space-x-1">
-              <span>{stats.lines} lines</span>
-            </div>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-1">
-              <Clock className="h-3 w-3" />
-              <span>{stats.readingTime} min read</span>
-            </div>
-            
-            <div className="flex items-center space-x-1">
-              <Zap className="h-3 w-3" />
-              <span>{stats.size}</span>
-            </div>
-          </div>
-        </div>
+    <footer
+      className="z-30 flex h-statusbar shrink-0 items-center gap-3 border-t border-border
+                 bg-surface px-3 text-[11px] text-muted-foreground"
+    >
+      <button
+        type="button"
+        onClick={onRename}
+        className="flex min-w-0 items-center gap-1.5 rounded px-1 py-0.5 transition-colors
+                   hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-ring"
+        title="Cambiar nombre del documento"
+      >
+        <FileText className="h-3 w-3 shrink-0" aria-hidden="true" />
+        <span className="max-w-[16rem] truncate">{fileName}</span>
+      </button>
+
+      <span aria-hidden="true" className="h-3 w-px bg-border" />
+
+      <span className="flex items-center gap-1">
+        <Hash className="h-3 w-3" aria-hidden="true" />
+        <span className="tabular-nums">{stats.words.toLocaleString('es')}</span>
+        <span className="visually-hidden"> palabras</span>
+      </span>
+
+      <span className="hidden items-center gap-1 sm:flex">
+        <span className="tabular-nums">{stats.characters.toLocaleString('es')}</span>
+        <span className="visually-hidden"> caracteres</span>
+        <span aria-hidden="true" className="visually-hidden">,</span>
+      </span>
+
+      <span className="hidden items-center gap-1 md:flex">
+        <span className="tabular-nums">{stats.lines.toLocaleString('es')}</span>
+        <span className="visually-hidden"> líneas</span>
+      </span>
+
+      <div className="ml-auto flex items-center gap-3">
+        <span className="hidden items-center gap-1 lg:flex">
+          <Clock3 className="h-3 w-3" aria-hidden="true" />
+          <span className="tabular-nums">{stats.readingMinutes} min</span>
+          <span className="visually-hidden"> de lectura</span>
+        </span>
+
+        <span className="hidden tabular-nums lg:inline">{formatBytes(stats.bytes)}</span>
+
+        <button
+          type="button"
+          onClick={() => update({ autoSave: !settings.autoSave })}
+          aria-pressed={settings.autoSave}
+          className={cn(
+            'flex items-center gap-1.5 rounded px-1.5 py-0.5 transition-colors',
+            'hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-ring',
+            isDirty ? 'text-primary' : 'text-muted-foreground',
+          )}
+          title={
+            settings.autoSave
+              ? 'Autoguardado activo: pulsa para desactivarlo'
+              : 'Autoguardado desactivado: pulsa para activarlo'
+          }
+        >
+          <span
+            aria-hidden="true"
+            className={cn(
+              'h-1.5 w-1.5 rounded-full',
+              isDirty ? 'bg-primary' : 'bg-success',
+              settings.autoSave && isDirty && 'animate-pulse-dot',
+            )}
+          />
+          {saveState}
+        </button>
       </div>
     </footer>
   )
 }
-
-export default Footer
